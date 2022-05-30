@@ -67,13 +67,35 @@ const resolvers = {
 		
 		CreateOrder: async (_parent: any, args: any) => {
 			const now = new Date();
-
+	  
 			const newOrder: orderCreationAttributes = {
-				transcode : args.transcode,
-				created: now.toDateString()
+			  transcode: nanoid(),
+			  created: now.toDateString()
+			};
+			const res = await order.create(newOrder)
+	
+			const findProduct = await product.findByPk(args.productId)
+			await product.update({stock:Number(findProduct?.stock)-args.quantity}, { where: { id: args.productId } });
+			const totalPrice = Number(findProduct?.price) * args.quantity
+	
+			const newOrderDetail: orderdetailCreationAttributes = {
+			  productid:Number(findProduct?.id),
+			  quantity:args.quantity,
+			  price: totalPrice,
+			  order_id: res.id
 			}
-			return await order.create(newOrder);
-		},
+			await orderdetail.create(newOrderDetail)
+			return res;
+		  },
+		// CreateOrder: async (_parent: any, args: any) => {
+		// 	const now = new Date();
+
+		// 	const newOrder: orderCreationAttributes = {
+		// 		transcode : args.transcode,
+		// 		created: now.toDateString()
+		// 	}
+		// 	return await order.create(newOrder);
+		// },
 
 		// GetDetailOrder: async (_parent: any, args: any) => {
 		// 	return await order.findByPk(args.id);
@@ -140,3 +162,7 @@ const server = new ApolloServer({
 server.listen().then(({ url }) => {
 	console.log(`🚀 Server ready at ${url}`);
 });
+
+function nanoid(): string {
+	throw new Error('Function not implemented.');
+}
