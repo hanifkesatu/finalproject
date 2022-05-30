@@ -9,7 +9,7 @@ type Mutation {
 	UpdateProduct(id:Int, name: String, stock:Int, price:Float): Product
 	DeleteProduct(id:Int): Product
 	GetDetailOrder(id: Int): Order
-	CreateOrder(transcode:Int): Order
+	CreateOrder(transcode:Int): Orderdetail
 
 }
 type Product {
